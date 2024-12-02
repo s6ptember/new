@@ -1,0 +1,16 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Контактная Информация{% endblock title %}
+
+{% block content %}
+    <h2>Контактная Информация</h2>
+    {% if contact_info %}
+        <p><strong>Наш адрес:</strong> {{ contact_info.address }}</p>
+        <p><strong>Телефон отдела продаж:</strong> {{ contact_info.manager_phone }}</p>
+        <p><strong>График работы отдела продаж:</strong> {{ contact_info.timetable }}</p>
+        <p><strong>Электронный ящик:</strong> {{ contact_info.mail }}</p>
+    {% else %}
+        <p>Контактная информация не найдена.</p>
+    {% endif %}
+{% endblock %}

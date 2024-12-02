@@ -1,0 +1,69 @@
+<!-- cart/detail.html -->
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <h1>Корзина</h1>
+    {% if cart %}
+        <div class="cart">
+            <div class="cart-container">
+                {% for item in cart %}
+                    <div class="cart-item">
+                        <div class="cart-item-image">
+                            <a href="{% url 'index:product_detail' item.product.sku %}">
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                            </a>
+                        </div>
+                        <div class="cart-item-details">
+                            <h3>
+                                <a href="{% url 'index:product_detail' item.product.sku %}">{{ item.product.name }}</a>
+                            </h3>
+                            <p>Количество: {{ item.quantity }}</p>
+                        </div>
+                        <div class="cart-item-price">
+                            <p>{{ item.product.sell_price }} руб.</p>
+                            <form action="{% url 'cart:cart_remove' item.product.sku %}" method="post" style="display:inline;" class="incartbtn">
+                                {% csrf_token %}
+                                <button type="submit">Удалить</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    {% if request.user.can_take_installment %}
+                        <div class="installment-option">
+                            <h4>Взять в рассрочку</h4>
+                            <form action="{% url 'cart:take_installment' item.product.sku %}" method="post">
+                                {% csrf_token %}
+                                <label for="months">Выберите количество месяцев:</label>
+                                <select name="months" id="months">
+                                    <option value="3">3 месяца</option>
+                                    <option value="4">4 месяца</option>
+                                    <option value="5">5 месяцев</option>
+                                    <option value="6">6 месяцев</option>
+                                    <option value="7">7 месяцев</option>
+                                    <option value="8">8 месяцев</option>
+                                    <option value="9">9 месяцев</option>
+                                </select>
+                                <button type="submit">Оформить рассрочку</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="cart-finally">
+                <div class="fncart">
+                    <h3>О заказе</h3>
+                    <div class="fncartd">
+                        <p>Общая сумма: {{ cart.get_total_price }} руб.</p>
+                        <p>Количество товаров: {{ cart|length }}</p>
+                    </div>
+                    
+                    <a href="{% if user.is_authenticated %}{% url "orders:order_create" %}{% else %}{% url "users:login" %}{% endif %}" class="orderreateincart">Оформить заказ</a>
+                </div>
+                
+            </div>
+        </div>
+    {% else %}
+        <p>Корзина пуста.</p>
+    {% endif %}
+    <a href="{% url 'index:product_list' %}" class="nextbtn">Продолжить покупки</a>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Профиль{% endblock title %}
+
+{% block content %}
+    <h2>Профиль пользователя</h2>
+    <div class="profile">
+        <div class="left-side">
+            <h3 class="privat-info-title">Личная информация</h3>
+            <p>В случае наличия, автоматически будет заполняться при оформлении заказа.</p>
+            <form method="post" class="prof-form">
+                {% csrf_token %}
+                <div class="form-container">
+                    <div class="left-column">
+                        <p class="form-tag">
+                            {{ form.first_name.label_tag }} {{ form.first_name }}
+                        </p>
+                        <p class="form-tag">
+                            {{ form.last_name.label_tag }} {{ form.last_name }}
+                        </p>
+                        <p class="form-tag">
+                            {{ form.middle_name.label_tag }} {{ form.middle_name }}
+                        </p>
+                        <p class="form-tag">
+                            {{ form.phone_number.label_tag }} {{ form.phone_number }}
+                        </p>
+                        <p class="form-tag">
+                            {{ form.city.label_tag }} {{ form.city }}
+                        </p>
+                    </div>
+                    <div class="right-column">
+                        <p class="form-tag">
+                            {{ form.postal_code.label_tag }} {{ form.postal_code }}
+                        </p>
+                        <p class="form-tag">
+                            {{ form.street.label_tag }} {{ form.street }}
+                        </p>
+                        <p class="form-tag">
+                            {{ form.house_number.label_tag }} {{ form.house_number }}
+                        </p>
+                        <p class="form-tag">
+                            {{ form.apartment_number.label_tag }} {{ form.apartment_number }}
+                        </p>
+                    </div>
+                </div>
+                <div class="profile-buttons">
+                    <button type="submit" class="btnforred">Сохранить изменения</button>
+                    <a href="{% url 'users:logout' %}" class="lgoutbtn">Выход из профиля</a>
+                </div>
+                
+            </form>
+            
+        </div>
+        <div class="right-side">
+            <h3 class="privat-info-title">
+                Ваши заказы
+            </h3>
+            {% if orders %}
+                <div class="orderss">
+                    {% for order in orders|dictsortreversed:"created_at" %}
+                        <div class="order-cart">
+                            <h4 class="order-title">Заказ № {{ order.id }}</h4>
+                            <p class="order-desc">
+                                {% for item in order.items.all %}
+                                    <div class="orders-carts">
+                                        <div class="order-imgonp">
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" >
+                                        </div>
+                                        <div class="orders-detail">
+                                            <a class="" href="" class="fwz">{{ item.product.name }}</a><br>
+                                            <span class="dadad">Количество:</span> {{ item.quantity }},
+                                            <span class="dadad">Цена: {{ item.price }} руб.</span> <br>
+                                            <span class="dadad">Дата:</span>  {{ order.created_at }}
+                                            <br>
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'index:product_detail' item.product.sku %}" class="btntodetail">
+                                                <img src="{% static 'img/link.png' %}" alt="">
+                                            </a>
+                                        </div>
+                                        
+                                    </div>
+                                {% endfor %}
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <h4 class="notorders">Нет заказов.</h4>
+            {% endif %} 
+        </div>
+    </div>
+{% endblock content %}
+        

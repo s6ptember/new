@@ -1,0 +1,20 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Доставка{% endblock title %}
+
+{% block content %}
+    <h2>Оформление заказа</h2>
+    {% if contact_info %}
+        <div class="contct">
+            <p><strong>Курьером по Соль-Илецку:</strong> {{ contact_info.courier_delivery }}</p>
+            <p><strong>Доставка по России:</strong> {{ contact_info.delivery_in_russia }}</p>
+            <p><strong>Наличными:</strong> {{ contact_info.cash_payment }}</p>
+            <p><strong>Наложенным платежом:</strong> {{ contact_info.cash_on_delivery }}</p>
+            <p><strong>Электронными деньгами:</strong> {{ contact_info.electronic_money }}</p>
+        </div>
+
+    {% else %}
+        <p>Контактная информация не найдена.</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock title %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="first">
+                <nav class="navbar1">
+                    <ul>
+                        <li><a href="{% url 'index:product_list' %}" class="cst">Каталог</a></li>
+                        <li><a href="{% url "info:delivery" %}">Доставка и оплата</a></li>
+                        <li><a href="{% url "info:contacts" %}">Контакты</a></li>
+                    </ul>
+                    <ul>
+                        <li><a href="{% url 'index:product_list' %}?sort=discount">Акции</a></li>
+                        <li><a href="{% url 'index:product_list' %}?sort=date_desc">Новинки</a></li>
+                    </ul>
+                </nav>
+                <nav class="navbar2">
+                    <a href="{% url "index:product_list" %}" class="logo">
+                        <img src="{% static 'img/plogo.png' %}" alt="">
+                    </a>
+                    <div class="next">
+                        <div class="box1">
+                            <div class="grafik">
+                                <img src="{% static 'img/grafik.png' %}" alt="">
+                                <div class="grbox">
+                                    <div class="gr1">
+                                        Пн-Пт: 09:00 - 19:00
+                                    </div>
+                                    <div class="gr2">
+                                        Сб-Вс: 10:00 - 17:00 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="phone-number">
+                                <img src="{% static 'img/call.png' %}" alt="">
+                                <div class="num">
+                                    <div>{{ contact_info.phone_number }}</div>
+                                    <div>Обратный звонок</div>
+                                </div>
+                            </div>
+                            <div class="buttons">
+                                <div class="profile-text">
+                                    <a href="{% if user.is_authenticated %}{% url "users:profile" %}{% else %}{% url "users:login" %}{% endif %}" class="profile-btn">
+                                        <img src="{% static 'img/profile.png' %}" alt="">
+                                        Профиль
+                                    </a>
+                                </div>
+                                <div href="#" class="favorites-btn">
+                                    
+                                    <a href="{% if user.is_authenticated %}{% url "users:favorites_list" %}{% else %}{% url "users:login" %}{% endif %}" class="favorites-text">
+                                        <img src="{% static 'img/heart.png' %}" alt="">
+                                        Избранное   
+                                    </a>
+                                </div>
+                                <div class="cart-text" style="position: relative;">
+                                    <a href="{% url "cart:cart_detail" %}" class="cart-btn">
+                                        <img src="{% static 'img/cart.png' %}" alt="">
+                                        Корзина
+                                        <span class="cart-quantity">
+                                            {% with cart_quantity=cart|length %}
+                                                {% if cart_quantity > 0 %}
+                                                    {{ cart_quantity }}
+                                                {% else %}
+                                                    0
+                                                {% endif %}
+                                            {% endwith %}
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        
+    </header>
+    <div class="container">
+        
+        
+    </div>
+    <div class="searchbar">
+        <div class="forsearchbar">
+            <div class="catalog">
+                <a href="#" class="catalog-toggle"><span class="catalog-text">Каталог</span> <img src="{% static 'img/right.png' %}" class="right" alt=""></a>
+                <ul class="category-dropdown">
+                    {% for category in categories %}
+                        <li class="category-item">
+                            <a href="#" class="cat-name category-toggle">{{ category.name }} <img src="{% static 'img/right.png' %}" alt="" class="right"></a>
+                            {% if category.subcategories.all %}
+                                <ul class="subcategory-dropdown" style="display: none;"> <!-- Скрываем подкатегории по умолчанию -->
+                                    {% for subcategory in category.subcategories.all %}
+                                        <li><a href="{% url 'index:product_list_by_subcategory' category.slug subcategory.slug %}" class="cat-btn">{{ subcategory.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="search">
+                <form class="news-form" method="GET" action="{% url 'index:product_list' %}" id="search-form">
+                    <input class="news-form__input" name="q" type="text" placeholder="Поиск">
+                </form>
+            </div>
+            <div class="search-btn">
+                <a href="#" id="search-link">Найти</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        {% block content %}{% endblock content %}
+    </div>
+
+        
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const catalogToggle = document.querySelector('.catalog-toggle');
+            const categoryDropdown = document.querySelector('.category-dropdown');
+        
+            catalogToggle.addEventListener('click', function (event) {
+                event.preventDefault(); 
+                categoryDropdown.classList.toggle('active'); 
+            });
+        
+            document.addEventListener('click', function (event) {
+                if (!catalogToggle.contains(event.target) && !categoryDropdown.contains(event.target)) {
+                    categoryDropdown.classList.remove('active'); 
+                }
+            }); 
+        
+            const categoryToggles = document.querySelectorAll('.category-toggle');
+            categoryToggles.forEach(toggle => {
+                toggle.addEventListener('click', function (event) {
+                    event.preventDefault(); 
+                    const subcategoryDropdown = this.nextElementSibling; 
+                    if (subcategoryDropdown) {
+                        subcategoryDropdown.classList.toggle('active'); 
+                        subcategoryDropdown.style.display = subcategoryDropdown.style.display === 'block' ? 'none' : 'block'; // Меняем стиль отображения
+                    }
+                });
+            });
+        });
+
+        document.getElementById('search-link').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('search-form').submit();
+        });
+
+        function toggleSortMenu() {
+            var sortMenu = document.getElementById("sort-menu");
+            sortMenu.style.display = (sortMenu.style.display === "block") ? "none" : "block";
+        }
+        
+
+        document.addEventListener('click', function(event) {
+            var sortMenu = document.getElementById("sort-menu");
+            var sortToggle = document.querySelector(".sort-toggle");
+            
+            if (sortMenu.style.display === "block" && !sortMenu.contains(event.target) && !sortToggle.contains(event.target)) {
+                sortMenu.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>

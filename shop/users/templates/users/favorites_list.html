@@ -1,0 +1,52 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Избранное{% endblock title %}
+
+{% block content %}
+    <h1>Избранное</h1>
+    {% if user.is_authenticated %}
+        {% if favorites %}
+            <div class="cart">
+                <div class="cart-container">
+                    {% for favorite in favorites %}
+                        <div class="cart-item">
+                            <div class="cart-item-image">
+                                <a href="{% url 'index:product_detail' favorite.product.sku %}">
+                                    <img src="{{ favorite.product.image.url }}" alt="{{ favorite.product.name }}">
+                                </a>
+                            </div>
+                            <div class="cart-item-details">
+                                <h3>
+                                    <a href="{% url 'index:product_detail' favorite.product.sku %}">{{ favorite.product.name }}</a>
+                                </h3>
+                                <p>Цена: {{ favorite.product.sell_price }} руб.</p>
+                            </div>
+                            <div class="favorite-item-actions">
+                                <form action="{% url 'users:remove_from_favorites' favorite.product.sku %}" method="post"  class="incartbtn" style="display:inline;" class="remove-favorite">
+                                    {% csrf_token %}
+                                    <button type="submit">Удалить из избранного</button>
+                                </form>
+                                <form action="{% url 'cart:cart_add' favorite.product.sku %}" class="qform forfav" method="post">
+                                    <div class="cart-form">
+                                        {{ cart_product_form }}
+                                        {% csrf_token %}
+                                    </div>
+                                    <input type="submit" class="add-to-cart-btn forfav" value="В корзину">
+                                </form>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>Ваш список избранного пуст.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <p>Список избранного пуст.</p>
+        {% endif %}
+        <a href="{% url 'index:product_list' %}" class="nextbtn">Продолжить покупки</a>
+    {% else %}
+        <h2 class="text-center">Войдите для использования данного раздела.</h2>
+    {% endif %}
+    
+{% endblock content %}

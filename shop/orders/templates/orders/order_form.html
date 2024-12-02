@@ -1,0 +1,60 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <h2>Оформление заказа</h2>
+    <div class="oform">
+        <form method="post" class="prof-form forord">
+            {% csrf_token %}
+            <div class="form-container">
+                <div class="left-column">
+                    <p class="form-tag">
+                        {{ form.first_name.label_tag }} {{ form.first_name }}
+                    </p>
+                    <p class="form-tag">
+                        {{ form.last_name.label_tag }} {{ form.last_name }}
+                    </p>
+                    <p class="form-tag">
+                        {{ form.middle_name.label_tag }} {{ form.middle_name }}
+                    </p>
+                    <p class="form-tag">
+                        {{ form.phone_number.label_tag }} {{ form.phone_number }}
+                    </p>
+                    <p class="form-tag">
+                        {{ form.city.label_tag }} {{ form.city }}
+                    </p>
+                    <p class="">
+                        {{ form.cash_payment.label_tag }} {{ form.cash_payment }}
+                    </p>
+                </div>
+                <div class="right-column">
+                    <p class="form-tag">
+                        {{ form.postal_code.label_tag }} {{ form.postal_code }}
+                    </p>
+                    <p class="form-tag">
+                        {{ form.street.label_tag }} {{ form.street }}
+                    </p>
+                    <p class="form-tag">
+                        {{ form.house_number.label_tag }} {{ form.house_number }}
+                    </p>
+                    <p class="form-tag">
+                        {{ form.apartment_number.label_tag }} {{ form.apartment_number }}
+                    </p>
+                </div>
+            </div>
+            <div class="cart-finally orderformq">
+                <div class="fncart">
+                    <h3>О заказе</h3>
+                    <div class="fncartd">
+                        <p>
+                            После оформления с вами свяжется менеджер для уточнения вопросов доставки и оплаты.
+                        </p>
+                    </div>
+                    <button type="submit">Оформить заказ</button>
+                </div>
+            </div>
+            
+        </form>
+        
+    </div>
+    
+{% endblock %}

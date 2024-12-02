@@ -1,0 +1,135 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }}{% endblock title %}
+
+{% block content %}
+    <div class="product-detail">
+        <div class="pbox1">
+            <div class="product-img">
+                {% for image in product.images.all %}
+                    <img class="detail-image" src="{{ image.image.url }}" alt="" style="display: none;" data-index="{{ forloop.counter0 }}">
+                {% endfor %}
+                <div class="image-nav">
+                    <button class="prev-btn">&lsaquo;</button>
+                    <button class="next-btn">&rsaquo;</button>
+                </div>
+            </div>
+            <script>
+                const images = document.querySelectorAll('.detail-image');
+                const prevBtn = document.querySelector('.prev-btn');
+                const nextBtn = document.querySelector('.next-btn');
+                let currentIndex = 0;
+    
+                images[currentIndex].style.display = 'block';
+    
+                if (images.length === 1) {
+                    prevBtn.style.display = 'none';
+                    nextBtn.style.display = 'none';
+                } else {
+                    prevBtn.addEventListener('click', () => {
+                        images[currentIndex].style.display = 'none';
+                        currentIndex = (currentIndex - 1 + images.length) % images.length;
+                        images[currentIndex].style.display = 'block';
+                    });
+    
+                    nextBtn.addEventListener('click', () => {
+                        images[currentIndex].style.display = 'none';
+                        currentIndex = (currentIndex + 1) % images.length;
+                        images[currentIndex].style.display = 'block';
+                    });
+                }
+            </script>
+            <div class="product-info">
+                <div class="product-name">
+                    <h1>{{ product.name }}</h1>
+                </div>
+                <div class="product-desc">
+                    <h3>Описание:</h3>
+                    <p>{{ product.description }}</p>
+                </div>
+                <div class="audio-desc">
+                    {% if product.audio_file %}
+                        <h3>Аудиоописание:</h3>
+                        <audio controls>
+                            <source src="{{ product.audio_file.url }}" type="audio/mpeg">
+                            Ваш браузер не поддерживает аудиоплеер.
+                        </audio>
+                    {% endif %}
+                </div>
+                <div class="product-available">
+                    <p><h3>Доступность:</h3> {% if product.available %} Доступен {% else %} Недоступен {% endif %}</p>
+                </div>
+                <div class="product-price">
+                    {% if product.discount %}
+                    <div class="cart-discount d-flex gap-2">
+                        <p class="line">{{ product.price }} руб.</p>
+                        <p class="price">{{ product.sell_price }} руб.</p>
+                    </div>
+                    {% else %}
+                        <p class="price">{{ product.price }} руб.</p>
+                    {% endif %}
+                </div>
+                <div class="forms">
+                    <div class="add-form">
+                        <form action="{% url 'cart:cart_add' product.sku %}" class="qform" method="post">
+                            <div class="cart-form">
+                                {{ cart_product_form }}
+                                {% csrf_token %}
+                            </div>
+                            <input type="submit" class="add-to-cart-btn" value="Добавить в корзину">
+                        </form>
+                    </div>
+                    <div class="favorites-form">
+                        {% if user.is_authenticated %}
+                            {% if is_favorited %}
+                                <form action="{% url 'users:remove_from_favorites' product.sku %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="fav-btn">Удалить из избранного</button>
+                                </form>
+                            {% else %}
+                                <form action="{% url 'users:add_to_favorites' product.sku %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="fav-btn">Добавить в избранное</button>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="pbox2">
+            <h2>Отзывы</h2>
+            <div class="reviews" id="reviews-container">
+                {% for review in reviews|slice:":5" %}
+                <div class="review">
+                    <strong>{{ review.user.first_name }} {{ review.user.last_name }}</strong>
+                    <p>Рейтинг: {{ review.rating }} звёзд</p>
+                    <p>{{ review.comment }}</p>
+                    <p><em>Добавлено: {{ review.created_at }}</em></p>
+                </div>
+                {% empty %}
+                    <p>Отзывов пока нет.</p>
+                {% endfor %}
+            </div>
+        
+            {% if reviews|length > 5 %}
+            <button id="load-more" type="button">Загрузить еще отзывы</button>
+            {% endif %}
+        
+            <div class="add-review">
+                <h3>Добавить ваш отзыв</h3>
+                <form action="{% url 'comments:add_review' product.sku %}" method="post" class="review-form">
+                    {% csrf_token %}
+                    {{ review_form.as_p }}
+                    <button type="submit">Отправить отзыв</button>
+                </form>
+            </div>
+        </div>
+
+        
+        {% comment %} <a href="{% url 'index:product_list' %}">Назад к списку продуктов</a> {% endcomment %}
+    </div>
+{% endblock content %}

@@ -1,0 +1,32 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block content %}
+    <h2>Спасибо за ваш заказ!</h2>
+    <p>Ваш заказ был успешно оформлен. Номер заказа: <strong>{{ order.id }}</strong></p>
+    <p>Общая сумма: <strong>{{ order.total_price }} рублей</strong></p>
+    <h3>Детали вашего заказа:</h3>
+    <ul>
+        {% for item in order.items.all %}
+        <div class="orders-carts">
+            <div class="order-imgonp">
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" >
+            </div>
+            <div class="orders-detail">
+                <a class="" href="" class="fwz">{{ item.product.name }}</a><br>
+                <span class="dadad">Количество:</span> {{ item.quantity }},
+                <span class="dadad">Цена: {{ item.price }} руб.</span> <br>
+                <span class="dadad">Дата:</span>  {{ order.created_at }}
+                <br>
+            </div>
+            <div>
+                <a href="{% url 'index:product_detail' item.product.sku %}" class="btntodetail">
+                    <img src="{% static 'img/link.png' %}" alt="">
+                </a>
+            </div>
+            
+        </div>
+        {% endfor %}
+    </ul>
+    <p>В скором времени с вами связжется менеджер для уточнения вопросов доставки и оплаты.</p>
+{% endblock %}

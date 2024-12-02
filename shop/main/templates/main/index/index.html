@@ -1,0 +1,125 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Главная{% endblock title %}
+
+{% block content %}
+    {% comment %} <h1>Каталог продуктов</h1> {% endcomment %}
+    <div class="catalog">
+        <div class="sort">
+            <button class="sort-toggle" onclick="toggleSortMenu()">Сортировка</button> <!-- Кнопка для открытия меню -->
+            
+            <div id="sort-menu" class="sort-menu" onclick="event.stopPropagation();">
+                <button class="close-button" onclick="toggleSortMenu()">✖</button> <!-- Кнопка закрытия -->
+                
+                <form method="GET" action="" class="formsort">
+                    <label for="sort" class="sortlabel">Сортировка:</label>
+                    
+                    <select name="sort" id="sort" onchange="this.form.submit()">
+                        <option value="">Выбрать Сортировку</option>
+                        {% for option in sort_options %}
+                            <option value="{{ option.value }}"{% if option.value == request.GET.sort %} selected{% endif %}>
+                                {{ option.label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                    <div class="sort-buttons">
+                        <button type="submit" name="sort_by_discount" value="1" class="btnforix {% if request.GET.sort_by_discount %}selected{% endif %}">
+                            Товары со скидкой
+                        </button>
+                        <button type="submit" name="sort_by_date" value="1" class="btnforix {% if request.GET.sort_by_date %}selected{% endif %}">
+                            Сначала новые
+                        </button>
+                    </div>
+                    
+                    <a href="{% url 'index:product_list' %}" class="resetbtn">Сбросить фильтры</a>
+                </form>
+            </div>
+        </div>
+        
+    
+        <div class="products">
+            <h2>Товары</h2>
+            <div class="bannerr">
+                {% for banner in banners %}
+                    <a href="{{ banner.url }}" class="banner">
+                        <img src="{{ banner.image.url }}" alt="Баннер" width="200" height="100">
+                    </a>
+                {% endfor %}
+            </div>
+            <div class="cards">
+                {% for product in products %}
+                <li class="card" onclick="location.href='{% url 'index:product_detail' product.sku %}';">
+                    <div class="card-img">
+                        <div class="favorite-icon">
+                            {% if request.user.is_authenticated and product.id in favorite_products %}
+                                <form action="{% url 'users:remove_from_favorites' product.sku %}" method="post" class="favorite-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="hbtn">
+                                        <img src="{% static 'img/red-heart.png' %}" alt="Удалить из избранного">
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form action="{% url 'users:add_to_favorites' product.sku %}" method="post" class="favorite-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="hbtn">
+                                        <img src="{% static 'img/gray-heart.png' %}" alt="Добавить в избранное">
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                        <img src="{{ product.image.url }}" alt="">
+                    </div>
+                    <h3>{{ product.name }}</h3>
+                    {% if product.discount %}
+                        <div class="cart-discount">
+                            <p class="line">{{ product.price }} руб.</p>
+                            <p class="price">{{ product.sell_price }} руб.</p>
+                        </div>
+                    {% else %}
+                        <p class="pricee">{{ product.price }} руб.</p>
+                    {% endif %}
+                    <div class="card-info">
+                        <form action="{% url 'cart:cart_add' product.sku %}" method="post" class="buy-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <input type="hidden" name="override" value="false">
+                            <button type="submit" class="card-btn">Купить</button>
+                        </form>
+                        <p class="review-count">Отзывов: {{ product.review_count }}</p>
+                    </div>
+                </li>
+                {% empty %}
+                    <li>Нет продуктов для отображения.</li>
+                
+                {% endfor %}
+            </div>
+           
+        
+            <div class="pagination">
+                {% if is_paginated %}
+                    <div class="pagination-links">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link"> &lt; </a>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if num == page_obj.number %}
+                                <div class="current-page">{{ num }}</div>  <!-- Текущая страница выделена -->
+                            {% else %}
+                                <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
+                            {% endif %}
+                            {% if not forloop.last %} {% endif %}  <!-- Добавляем запятую между номерами страниц -->
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="pagination-link"> &gt; </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+{% endblock content %}

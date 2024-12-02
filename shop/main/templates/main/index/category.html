@@ -1,0 +1,28 @@
+<ul>
+    {% for category in categories %}
+        <li class="category">
+            {{ category.name }} ({{ category.slug }})
+            {% if category.products.all %}
+                <h3>Продукты:</h3>
+                <ul class="products">
+                    {% for product in category.products.all %}
+                        <li>
+                            <h4>{{ product.name }}</h4>
+                            <p>Артикул: {{ product.sku }}</p>
+                            <p>Цена: {{ product.price }}</p>
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="100">
+                            {% endif %}
+                            <p>{{ product.description }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if category.subcategories.all %}
+                <ul class="subcategory">
+                    {% include 'main/index/category.html' with categories=category.subcategories.all %}
+                </ul>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

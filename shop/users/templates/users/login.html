@@ -1,0 +1,30 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Вход{% endblock title %}
+
+{% block content %}
+    <div class="loginform">
+        <h2>Вход</h2>
+        <form method="post" class="loginform">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="error">{{ form.non_field_errors }}</div>
+            {% endif %}
+            <p class="form-tag">
+                {{ form.phone_number.label_tag }} {{ form.phone_number }}
+                {% if form.phone_number.errors %}
+                    <div class="error">{{ form.phone_number.errors }}</div>
+                {% endif %}
+            </p>
+            <p class="form-tag">
+                {{ form.password.label_tag }} {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="error">{{ form.password.errors }}</div>
+                {% endif %}
+            </p>
+            <button type="submit" class="regisbtn">Войти</button>
+        </form>
+        <p>Нет аккаунта? <a href="{% url 'users:registration' %}" class="">Зарегистрируйтесь</a></p>
+    </div>
+{% endblock content %}
